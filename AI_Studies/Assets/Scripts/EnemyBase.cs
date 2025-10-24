@@ -8,6 +8,7 @@ public enum States
 {
     Idle,
     Patrol,
+    Chase
 }
 
 public class EnemyBase : MonoBehaviour
@@ -20,9 +21,12 @@ public class EnemyBase : MonoBehaviour
     private float _elapsedTime = 0;
     [SerializeField] private float timeToWait = 1f;
     private Vector3 _targetPos;
+    private RaycastHit hit;
     
     [SerializeField] private States state;
     [SerializeField] private float speed;
+    [SerializeField] private float sightRange = 10;
+    [SerializeField] private LayerMask targetLayer;
     
 
     private void Awake()
@@ -37,7 +41,7 @@ public class EnemyBase : MonoBehaviour
     private void Update()
     {
         _agent.speed = speed;
-        
+
         switch (state)
         {
             case States.Idle:
@@ -45,6 +49,9 @@ public class EnemyBase : MonoBehaviour
                 break;
             case States.Patrol:
                 HandlePatrol();
+                break;
+            case States.Chase:
+                HandleChase();
                 break;
         }
     }
@@ -68,5 +75,21 @@ public class EnemyBase : MonoBehaviour
         {
             _elapsedTime  += Time.deltaTime;
         }
+    }
+
+    private void HandleChase()
+    {
+        _agent.destination = hit.transform.position;
+    }
+
+    private void HandleSight()
+    {
+
+    }
+    
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = new Color(0.75f, 0.0f, 0.0f, 0.75f);
+        Gizmos.DrawWireSphere(this.transform.position, sightRange);
     }
 }
